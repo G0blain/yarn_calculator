@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Yarn Calculator',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber), useMaterial3: true),
       debugShowCheckedModeBanner: false,
-      home: const CalculatingPage(title: 'Yarn Calculator'),
+      home: CalculatingPage(),
     );
   }
 }
