@@ -35,7 +35,12 @@ class _CroppingPageState extends State<CroppingPage> {
                           (context) => AlertDialog(
                             title: Text('Error'),
                             content: Text('Failed to crop image: ${cause}'),
-                            actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text('OK'))],
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text('OK'),
+                              ),
+                            ],
                           ),
                     );
                     break;
@@ -44,7 +49,10 @@ class _CroppingPageState extends State<CroppingPage> {
             ),
           ),
           SizedBox(height: 10),
-          ElevatedButton(onPressed: () => _cropController.crop(), child: Text('Valider')),
+          ElevatedButton(
+            onPressed: () => _cropController.crop(),
+            child: Text('Valider'),
+          ),
         ],
       ),
     );

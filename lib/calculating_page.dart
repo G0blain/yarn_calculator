@@ -12,7 +12,9 @@ class _CalculatingPageState extends State<CalculatingPage> {
   Uint8List? imageBytes;
 
   Future<void> pickImage() async {
-    final XFile? pickedFile = await new ImagePicker().pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile = await new ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
     if (pickedFile != null) {
       final Uint8List bytes = await pickedFile.readAsBytes();
       setState(() {
@@ -27,7 +29,9 @@ class _CalculatingPageState extends State<CalculatingPage> {
     }
     final croppedImage = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => CroppingPage(imageBytes: imageBytes!)),
+      MaterialPageRoute(
+        builder: (context) => CroppingPage(imageBytes: imageBytes!),
+      ),
     );
     if (croppedImage != null) {
       setState(() {
@@ -39,7 +43,10 @@ class _CalculatingPageState extends State<CalculatingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.inversePrimary, title: Text('Yarn Calculator')),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text('Yarn Calculator'),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -47,9 +54,16 @@ class _CalculatingPageState extends State<CalculatingPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(onPressed: pickImage, child: const Text('Importer une image')),
+                ElevatedButton(
+                  onPressed: pickImage,
+                  child: const Text('Importer une image'),
+                ),
                 const SizedBox(width: 10),
-                ElevatedButton.icon(onPressed: cropImage, icon: Icon(Icons.crop), label: Text('Crop')),
+                ElevatedButton.icon(
+                  onPressed: cropImage,
+                  icon: Icon(Icons.crop),
+                  label: Text('Crop'),
+                ),
               ],
             ),
             const SizedBox(height: 10),
