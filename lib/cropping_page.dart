@@ -3,8 +3,8 @@ import 'package:crop_your_image/crop_your_image.dart';
 import 'dart:typed_data';
 
 class CroppingPage extends StatefulWidget {
-  final Uint8List imageBytes;
-  CroppingPage({required this.imageBytes});
+  final Uint8List _imageBytes;
+  CroppingPage({required Uint8List imageBytes}) : _imageBytes = imageBytes;
 
   @override
   _CroppingPageState createState() => _CroppingPageState();
@@ -21,7 +21,7 @@ class _CroppingPageState extends State<CroppingPage> {
         children: [
           Expanded(
             child: Crop(
-              image: widget.imageBytes,
+              image: widget._imageBytes,
               controller: _cropController,
               onCropped: (result) {
                 switch (result) {

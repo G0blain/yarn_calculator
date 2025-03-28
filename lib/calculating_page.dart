@@ -9,33 +9,33 @@ class CalculatingPage extends StatefulWidget {
 }
 
 class _CalculatingPageState extends State<CalculatingPage> {
-  Uint8List? imageBytes;
+  Uint8List? _imageBytes;
 
-  Future<void> pickImage() async {
+  Future<void> _pickImage() async {
     final XFile? pickedFile = await new ImagePicker().pickImage(
       source: ImageSource.gallery,
     );
     if (pickedFile != null) {
       final Uint8List bytes = await pickedFile.readAsBytes();
       setState(() {
-        imageBytes = bytes;
+        _imageBytes = bytes;
       });
     }
   }
 
-  Future<void> cropImage() async {
-    if (imageBytes == null) {
+  Future<void> _cropImage() async {
+    if (_imageBytes == null) {
       return;
     }
     final croppedImage = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CroppingPage(imageBytes: imageBytes!),
+        builder: (context) => CroppingPage(imageBytes: _imageBytes!),
       ),
     );
     if (croppedImage != null) {
       setState(() {
-        imageBytes = croppedImage;
+        _imageBytes = croppedImage;
       });
     }
   }
@@ -55,20 +55,20 @@ class _CalculatingPageState extends State<CalculatingPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: pickImage,
+                  onPressed: _pickImage,
                   child: const Text('Importer une image'),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton.icon(
-                  onPressed: cropImage,
+                  onPressed: _cropImage,
                   icon: Icon(Icons.crop),
                   label: Text('Crop'),
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            imageBytes != null
-                ? Image.memory(imageBytes!, height: 300, fit: BoxFit.fitHeight)
+            _imageBytes != null
+                ? Image.memory(_imageBytes!, height: 300, fit: BoxFit.fitHeight)
                 : const Text('Aucune image sélectionnée'),
             const SizedBox(height: 10),
           ],
