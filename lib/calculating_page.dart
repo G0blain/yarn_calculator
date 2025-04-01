@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
 import 'package:yarn_calculator/cropping_page.dart';
 import 'package:image/image.dart' as imgPck;
+
+enum ClusteringMethods {
+  K_MEANS(label: 'K-Means'),
+  TEST(label: 'Test'),
+  HELLO_WORLD(label: 'Hello world');
+
+  final String label;
+
+  const ClusteringMethods({required this.label});
+}
 
 class CalculatingPage extends StatefulWidget {
   @override
@@ -12,6 +23,10 @@ class CalculatingPage extends StatefulWidget {
 class _CalculatingPageState extends State<CalculatingPage> {
   Uint8List? _imageBytes;
   // imgPck.Image? workingImage;
+  ClusteringMethods? _selectedClusteringMethod;
+  final TextEditingController _kTextFieldController = TextEditingController(
+    text: '3',
+  );
 
   Future<void> _pickImage() async {
     final XFile? pickedFile = await new ImagePicker().pickImage(
@@ -71,6 +86,7 @@ class _CalculatingPageState extends State<CalculatingPage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -99,6 +115,63 @@ class _CalculatingPageState extends State<CalculatingPage> {
                 ? Image.memory(_imageBytes!, height: 300, fit: BoxFit.fitHeight)
                 : const Text('No image selected'),
             const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Clustering method :',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 20),
+                DropdownButton<ClusteringMethods>(
+                  value: _selectedClusteringMethod,
+                  onChanged: (ClusteringMethods? newValue) {
+                    setState(() {
+                      _selectedClusteringMethod = newValue;
+                    });
+                  },
+                  items: [
+                    const DropdownMenuItem<ClusteringMethods>(
+                      value: null,
+                      child: Text(''),
+                    ),
+                    ...ClusteringMethods.values.map((ClusteringMethods method) {
+                      return DropdownMenuItem<ClusteringMethods>(
+                        value: method,
+                        child: Text(method.label),
+                      );
+                    }).toList(),
+                  ],
+                ),
+                if (_selectedClusteringMethod == ClusteringMethods.K_MEANS) ...[
+                  const SizedBox(width: 20),
+                  const Text('K:', style: TextStyle(fontSize: 14)),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 60,
+                    child: TextField(
+                      controller: _kTextFieldController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: _pickImage,
+              icon: Icon(Icons.play_arrow),
+              label: const Text('GO'),
+            ),
           ],
         ),
       ),
