@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:yarn_calculator/cropping_page.dart';
 import 'package:image/image.dart' as imgPck;
+import 'package:yarn_calculator/segmentation_service.dart';
 
 enum ClusteringMethods {
-  K_MEANS(label: 'K-Means'),
-  TEST(label: 'Test'),
-  HELLO_WORLD(label: 'Hello world');
+  CUT_PEAR_IN_HALF(label: 'Cut pear in half'),
+  K_MEANS(label: 'K-Means');
 
   final String label;
 
@@ -21,11 +21,12 @@ class CalculatingPage extends StatefulWidget {
 
 class _CalculatingPageState extends State<CalculatingPage> {
   Uint8List? _imageBytes;
-  // imgPck.Image? workingImage;
+  imgPck.Image? _workingImage;
+
   ClusteringMethods? _selectedClusteringMethod;
-  final TextEditingController _kTextFieldController = TextEditingController(
-    text: '3',
-  );
+
+  List<ColorZone> _colorZones = [];
+  ColorZone? _hoveredZone;
 
   Future<void> _pickImage() async {
     final XFile? pickedFile = await new ImagePicker().pickImage(
@@ -73,6 +74,14 @@ class _CalculatingPageState extends State<CalculatingPage> {
     setState(() {
       _imageBytes = test2;
     });
+  }
+
+  void _go() {
+    if (_imageBytes == null) {
+      return;
+    }
+    _workingImage = _bytesToImage(_imageBytes!);
+    _colorZones = SegmentationService.cutPearInHalf(_workingImage!);
   }
 
   @override
@@ -142,32 +151,11 @@ class _CalculatingPageState extends State<CalculatingPage> {
                     }).toList(),
                   ],
                 ),
-                if (_selectedClusteringMethod == ClusteringMethods.K_MEANS) ...[
-                  const SizedBox(width: 20),
-                  const Text('K:', style: TextStyle(fontSize: 14)),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                    width: 60,
-                    child: TextField(
-                      controller: _kTextFieldController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      textAlign: TextAlign.center,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 5,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
-              onPressed: _pickImage,
+              onPressed: _go,
               icon: Icon(Icons.play_arrow),
               label: const Text('GO'),
             ),
