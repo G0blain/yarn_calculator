@@ -20,14 +20,27 @@ class CalculatingPage extends StatefulWidget {
 }
 
 class _CalculatingPageState extends State<CalculatingPage> {
+  /**  
+   * Format of the image once loaded and used to display it
+  */
   Uint8List? _imageBytes;
+  /** 
+   * Key for accessing the image widget to retrieve its screen size (useful for converting a tap to actual image coordinates)
+   */
+  final GlobalKey _imageKey = GlobalKey();
+  /**
+   * Image format obtained from _imageBytes and used to process the image before saving the result back into _imageBytes
+  */
   imgPck.Image? _workingImage;
 
   ClusteringMethods? _selectedClusteringMethod;
 
   List<ColorZone> _colorZones = [];
-  ColorZone? _hoveredZone;
+  ColorZone? _selectedColorZone;
 
+  /**
+ * Allows the user to select an image from his gallery and store it in _imageBytes
+ */
   Future<void> _pickImage() async {
     final XFile? pickedFile = await new ImagePicker().pickImage(
       source: ImageSource.gallery,
@@ -40,10 +53,12 @@ class _CalculatingPageState extends State<CalculatingPage> {
     }
   }
 
+  /**
+ * Allows the user to crop the image on another page
+ */
   Future<void> _cropImage() async {
-    if (_imageBytes == null) {
-      return;
-    }
+    if (_imageBytes == null) return;
+
     final croppedImage = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -57,31 +72,80 @@ class _CalculatingPageState extends State<CalculatingPage> {
     }
   }
 
+  /**
+ * Convert image : Uint8List to 'package:image/image.dart' Image
+ */
   imgPck.Image _bytesToImage(Uint8List uint8list) {
     return imgPck.decodeImage(uint8list)!;
   }
 
+  /**
+ * Convert image : 'package:image/image.dart' Image to Uint8List
+ */
+  // ignore: unused_element
   Uint8List _imageToBytes(imgPck.Image image) {
     return Uint8List.fromList(imgPck.encodePng(image));
   }
 
-  void _test() {
-    if (_imageBytes == null) {
-      return;
-    }
-    imgPck.Image test = _bytesToImage(_imageBytes!);
-    Uint8List test2 = _imageToBytes(test);
+  void _go() {
+    if (_imageBytes == null) return;
+
+    _workingImage = _bytesToImage(_imageBytes!);
+    _colorZones = SegmentationService.cutPearInHalf(_workingImage!);
+  }
+
+  /**
+   * When the user touches a color zone on the image
+   */
+  void _handleTouchOnImage(Offset localPosition) {
+    if (_workingImage == null || _colorZones.isEmpty) return;
+
+    final context = _imageKey.currentContext;
+    if (context == null) return;
+
+    final box = context.findRenderObject() as RenderBox;
+    final displayedSize = box.size;
+
+    final Offset imageCoords = _mapTapToImageCoordinates(
+      localPosition,
+      displayedSize,
+      _workingImage!,
+    );
+
+    final zone = _getTouchedZone(imageCoords);
     setState(() {
-      _imageBytes = test2;
+      _selectedColorZone = zone;
     });
   }
 
-  void _go() {
-    if (_imageBytes == null) {
-      return;
+  /**
+   * Convert screen coordinates to image coordinates
+   */
+  Offset _mapTapToImageCoordinates(
+    Offset localPosition,
+    Size displayedSize,
+    imgPck.Image image,
+  ) {
+    double scaleX = image.width / displayedSize.width;
+    double scaleY = image.height / displayedSize.height;
+    return Offset(localPosition.dx * scaleX, localPosition.dy * scaleY);
+  }
+
+  /**
+ * Indicates the color zone corresponding to a position on the image
+ */
+  ColorZone? _getTouchedZone(Offset position) {
+    final int tappedX = position.dx.toInt();
+    final int tappedY = position.dy.toInt();
+
+    for (final ColorZone zone in _colorZones) {
+      for (final pixel in zone.pixels) {
+        if (pixel.x == tappedX && pixel.y == tappedY) {
+          return zone;
+        }
+      }
     }
-    _workingImage = _bytesToImage(_imageBytes!);
-    _colorZones = SegmentationService.cutPearInHalf(_workingImage!);
+    return null;
   }
 
   @override
@@ -112,7 +176,7 @@ class _CalculatingPageState extends State<CalculatingPage> {
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton.icon(
-                  onPressed: _test,
+                  onPressed: () => {},
                   icon: Icon(Icons.rocket),
                   label: Text('Test'),
                 ),
@@ -120,7 +184,18 @@ class _CalculatingPageState extends State<CalculatingPage> {
             ),
             const SizedBox(height: 10),
             _imageBytes != null
-                ? Image.memory(_imageBytes!, height: 300, fit: BoxFit.fitHeight)
+                ? GestureDetector(
+                  child: Image.memory(
+                    _imageBytes!,
+                    key: _imageKey,
+                    height: 300,
+                    fit: BoxFit.fitHeight,
+                  ),
+                  onTapDown: (TapDownDetails details) {
+                    final Offset position = details.localPosition;
+                    _handleTouchOnImage(position);
+                  },
+                )
                 : const Text('No image selected'),
             const SizedBox(height: 10),
             Row(
