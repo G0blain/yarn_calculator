@@ -76,6 +76,7 @@ class _CalculatingPageState extends State<CalculatingPage> {
  * Convert image : Uint8List to 'package:image/image.dart' Image
  */
   imgPck.Image _bytesToImage(Uint8List uint8list) {
+    // return decodeImageFromList(uint8list);
     return imgPck.decodeImage(uint8list)!;
   }
 
@@ -85,6 +86,13 @@ class _CalculatingPageState extends State<CalculatingPage> {
   // ignore: unused_element
   Uint8List _imageToBytes(imgPck.Image image) {
     return Uint8List.fromList(imgPck.encodePng(image));
+  }
+
+  /**
+   * Get Size from 'package:image/image.dart' Image
+   */
+  Size _getImageSize(imgPck.Image image) {
+    return Size(image.width.toDouble(), image.height.toDouble());
   }
 
   void _go() {
@@ -103,8 +111,8 @@ class _CalculatingPageState extends State<CalculatingPage> {
     final context = _imageKey.currentContext;
     if (context == null) return;
 
-    final box = context.findRenderObject() as RenderBox;
-    final displayedSize = box.size;
+    final RenderBox box = context.findRenderObject() as RenderBox;
+    final Size displayedSize = box.size;
 
     final Offset imageCoords = _mapTapToImageCoordinates(
       localPosition,
@@ -185,11 +193,28 @@ class _CalculatingPageState extends State<CalculatingPage> {
             const SizedBox(height: 10),
             _imageBytes != null
                 ? GestureDetector(
-                  child: Image.memory(
-                    _imageBytes!,
-                    key: _imageKey,
-                    height: 300,
-                    fit: BoxFit.fitHeight,
+                  child: Stack(
+                    children: [
+                      Image.memory(
+                        _imageBytes!,
+                        key: _imageKey,
+                        height: 300,
+                        fit: BoxFit.fitHeight,
+                      ),
+                      if (_workingImage != null)
+                        CustomPaint(
+                          painter: ColorZonePainter(
+                            selectedZone: _selectedColorZone,
+                            imageSize: _getImageSize(_workingImage!),
+                            displaySize: Size(
+                              300,
+                              300 *
+                                  _workingImage!.height /
+                                  _workingImage!.width,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   onTapDown: (TapDownDetails details) {
                     final Offset position = details.localPosition;
@@ -238,5 +263,45 @@ class _CalculatingPageState extends State<CalculatingPage> {
         ),
       ),
     );
+  }
+}
+
+class ColorZonePainter extends CustomPainter {
+  final ColorZone? selectedZone;
+  final Size imageSize;
+  final Size displaySize;
+
+  ColorZonePainter({
+    required this.selectedZone,
+    required this.imageSize,
+    required this.displaySize,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (selectedZone == null) return;
+
+    double scaleX = displaySize.width / imageSize.width;
+    double scaleY = displaySize.height / imageSize.height;
+
+    final Paint paint =
+        Paint()
+          ..color = Colors.red.withAlpha(128)
+          ..style = PaintingStyle.fill;
+
+    for (var pixel in selectedZone!.pixels) {
+      final Rect rect = Rect.fromLTWH(
+        pixel.x * scaleX,
+        pixel.y * scaleY,
+        scaleX,
+        scaleY,
+      );
+      canvas.drawRect(rect, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
   }
 }
