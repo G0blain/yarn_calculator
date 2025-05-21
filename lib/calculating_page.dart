@@ -49,6 +49,9 @@ class _CalculatingPageState extends State<CalculatingPage> {
       final Uint8List bytes = await pickedFile.readAsBytes();
       setState(() {
         _imageBytes = bytes;
+        _workingImage = null;
+        _colorZones = [];
+        _selectedColorZone = null;
       });
     }
   }
@@ -68,6 +71,9 @@ class _CalculatingPageState extends State<CalculatingPage> {
     if (croppedImage != null) {
       setState(() {
         _imageBytes = croppedImage;
+        _workingImage = null;
+        _colorZones = [];
+        _selectedColorZone = null;
       });
     }
   }
@@ -88,18 +94,14 @@ class _CalculatingPageState extends State<CalculatingPage> {
     return Uint8List.fromList(imgPck.encodePng(image));
   }
 
-  /**
-   * Get Size from 'package:image/image.dart' Image
-   */
-  Size _getImageSize(imgPck.Image image) {
-    return Size(image.width.toDouble(), image.height.toDouble());
-  }
-
   void _go() {
     if (_imageBytes == null) return;
 
-    _workingImage = _bytesToImage(_imageBytes!);
-    _colorZones = SegmentationService.cutPearInHalf(_workingImage!);
+    setState(() {
+      _workingImage = _bytesToImage(_imageBytes!);
+      _colorZones = SegmentationService.cutPearInHalf(_workingImage!);
+      _selectedColorZone = null;
+    });
   }
 
   /**
@@ -204,8 +206,11 @@ class _CalculatingPageState extends State<CalculatingPage> {
                       if (_workingImage != null)
                         CustomPaint(
                           painter: ColorZonePainter(
-                            selectedZone: _selectedColorZone,
-                            imageSize: _getImageSize(_workingImage!),
+                            zoneToColor: _selectedColorZone,
+                            imageSize: Size(
+                              _workingImage!.width.toDouble(),
+                              _workingImage!.height.toDouble(),
+                            ),
                             displaySize: Size(
                               300,
                               300 *
@@ -267,19 +272,19 @@ class _CalculatingPageState extends State<CalculatingPage> {
 }
 
 class ColorZonePainter extends CustomPainter {
-  final ColorZone? selectedZone;
+  final ColorZone? zoneToColor;
   final Size imageSize;
   final Size displaySize;
 
   ColorZonePainter({
-    required this.selectedZone,
+    required this.zoneToColor,
     required this.imageSize,
     required this.displaySize,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (selectedZone == null) return;
+    if (zoneToColor == null) return;
 
     double scaleX = displaySize.width / imageSize.width;
     double scaleY = displaySize.height / imageSize.height;
@@ -289,15 +294,19 @@ class ColorZonePainter extends CustomPainter {
           ..color = Colors.red.withAlpha(128)
           ..style = PaintingStyle.fill;
 
-    for (var pixel in selectedZone!.pixels) {
+    final Path path = Path();
+
+    for (var pixel in zoneToColor!.pixels) {
       final Rect rect = Rect.fromLTWH(
         pixel.x * scaleX,
         pixel.y * scaleY,
         scaleX,
         scaleY,
       );
-      canvas.drawRect(rect, paint);
+      path.addRect(rect);
     }
+
+    canvas.drawPath(path, paint);
   }
 
   @override
