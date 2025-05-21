@@ -268,7 +268,7 @@ class ColorZonePainter extends CustomPainter {
 
     final Paint paint =
         Paint()
-          ..color = Colors.red.withAlpha(128)
+          ..color = zoneToColor!.color.withAlpha(128)
           ..style = PaintingStyle.fill;
 
     final Path path = Path();
