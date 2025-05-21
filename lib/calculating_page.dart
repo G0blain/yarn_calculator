@@ -5,13 +5,13 @@ import 'package:yarn_calculator/cropping_page.dart';
 import 'package:image/image.dart' as imgPck;
 import 'package:yarn_calculator/segmentation_service.dart';
 
-enum ClusteringMethods {
+enum SegmentationMethods {
   CUT_PEAR_IN_HALF(label: 'Cut pear in half'),
   K_MEANS(label: 'K-Means');
 
   final String label;
 
-  const ClusteringMethods({required this.label});
+  const SegmentationMethods({required this.label});
 }
 
 class CalculatingPage extends StatefulWidget {
@@ -32,11 +32,13 @@ class _CalculatingPageState extends State<CalculatingPage> {
    * Image format obtained from _imageBytes and used to process the image before saving the result back into _imageBytes
   */
   imgPck.Image? _workingImage;
-
-  ClusteringMethods? _selectedClusteringMethod;
-
+  /**
+   * Color area in the image detected by the segmentation method
+   */
   List<ColorZone> _colorZones = [];
+
   ColorZone? _selectedColorZone;
+  SegmentationMethods? _selectedSegmentationMethod;
 
   /**
  * Allows the user to select an image from his gallery and store it in _imageBytes
@@ -209,20 +211,22 @@ class _CalculatingPageState extends State<CalculatingPage> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 20),
-                DropdownButton<ClusteringMethods>(
-                  value: _selectedClusteringMethod,
-                  onChanged: (ClusteringMethods? newValue) {
+                DropdownButton<SegmentationMethods>(
+                  value: _selectedSegmentationMethod,
+                  onChanged: (SegmentationMethods? newValue) {
                     setState(() {
-                      _selectedClusteringMethod = newValue;
+                      _selectedSegmentationMethod = newValue;
                     });
                   },
                   items: [
-                    const DropdownMenuItem<ClusteringMethods>(
+                    const DropdownMenuItem<SegmentationMethods>(
                       value: null,
                       child: Text(''),
                     ),
-                    ...ClusteringMethods.values.map((ClusteringMethods method) {
-                      return DropdownMenuItem<ClusteringMethods>(
+                    ...SegmentationMethods.values.map((
+                      SegmentationMethods method,
+                    ) {
+                      return DropdownMenuItem<SegmentationMethods>(
                         value: method,
                         child: Text(method.label),
                       );
