@@ -193,40 +193,13 @@ class _CalculatingPageState extends State<CalculatingPage> {
               ],
             ),
             const SizedBox(height: 10),
-            _imageBytes != null
-                ? GestureDetector(
-                  child: Stack(
-                    children: [
-                      Image.memory(
-                        _imageBytes!,
-                        key: _imageKey,
-                        height: 300,
-                        fit: BoxFit.fitHeight,
-                      ),
-                      if (_workingImage != null)
-                        CustomPaint(
-                          painter: ColorZonePainter(
-                            zoneToColor: _selectedColorZone,
-                            imageSize: Size(
-                              _workingImage!.width.toDouble(),
-                              _workingImage!.height.toDouble(),
-                            ),
-                            displaySize: Size(
-                              300,
-                              300 *
-                                  _workingImage!.height /
-                                  _workingImage!.width,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  onTapDown: (TapDownDetails details) {
-                    final Offset position = details.localPosition;
-                    _handleTouchOnImage(position);
-                  },
-                )
-                : const Text('No image selected'),
+            ImageViewer(
+              imageBytes: _imageBytes,
+              workingImage: _workingImage,
+              zoneToColor: _selectedColorZone,
+              imageKey: _imageKey,
+              onTap: _handleTouchOnImage,
+            ),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -312,5 +285,59 @@ class ColorZonePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
+  }
+}
+
+class ImageViewer extends StatelessWidget {
+  final Uint8List? imageBytes;
+  final imgPck.Image? workingImage;
+  final ColorZone? zoneToColor;
+  final GlobalKey imageKey;
+  final void Function(Offset localPosition) onTap;
+
+  const ImageViewer({
+    required this.imageBytes,
+    required this.workingImage,
+    required this.zoneToColor,
+    required this.imageKey,
+    required this.onTap,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageBytes == null) {
+      return const Center(child: Text('No image selected'));
+    }
+
+    return GestureDetector(
+      child: Stack(
+        children: [
+          Image.memory(
+            imageBytes!,
+            key: imageKey,
+            height: 300,
+            fit: BoxFit.fitHeight,
+          ),
+          if (workingImage != null)
+            CustomPaint(
+              painter: ColorZonePainter(
+                zoneToColor: zoneToColor,
+                imageSize: Size(
+                  workingImage!.width.toDouble(),
+                  workingImage!.height.toDouble(),
+                ),
+                displaySize: Size(
+                  300,
+                  300 * workingImage!.height / workingImage!.width,
+                ),
+              ),
+            ),
+        ],
+      ),
+      onTapDown: (TapDownDetails details) {
+        onTap(details.localPosition);
+      },
+    );
   }
 }
