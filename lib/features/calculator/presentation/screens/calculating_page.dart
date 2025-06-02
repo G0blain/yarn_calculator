@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:yarn_calculator/features/calculator/data/models/color_zone.dart';
+import 'package:yarn_calculator/features/calculator/presentation/widgets/color_table.dart';
 import 'package:yarn_calculator/features/crop/presentation/screens/cropping_page.dart';
 import 'package:image/image.dart' as imgPck;
 import 'package:yarn_calculator/features/calculator/presentation/widgets/image_viewer.dart';
@@ -242,6 +244,8 @@ class _CalculatingPageState extends State<CalculatingPage> {
               icon: Icon(Icons.play_arrow),
               label: const Text('GO'),
             ),
+            const SizedBox(height: 20),
+            ColorTable(zones: _colorZones),
           ],
         ),
       ),

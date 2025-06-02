@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as imgPck;
-
-class ColorZone {
-  final List<imgPck.Pixel> pixels;
-  final Color color;
-
-  ColorZone({required this.pixels, required this.color});
-}
+import 'package:yarn_calculator/features/calculator/data/models/color_zone.dart';
 
 class SegmentationService {
   /**

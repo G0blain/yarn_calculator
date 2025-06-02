@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as imgPck;
-import 'package:yarn_calculator/features/calculator/domain/segmentation_service.dart';
+import 'package:yarn_calculator/features/calculator/data/models/color_zone.dart';
 
 class ColorZonePainter extends CustomPainter {
   final ColorZone? zoneToColor;
