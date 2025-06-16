@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:yarn_calculator/core/widgets/my_app_scaffold.dart';
 import 'package:yarn_calculator/features/calculator/data/models/color_zone.dart';
 import 'package:yarn_calculator/features/calculator/presentation/widgets/color_table.dart';
 import 'package:yarn_calculator/features/crop/presentation/screens/cropping_page.dart';
@@ -165,85 +166,94 @@ class _CalculatingPageState extends State<CalculatingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Yarn Calculator')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
+    return MyAppScaffold.MyAppScaffold(
+      title: 'Yarn Calculator',
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                ElevatedButton.icon(
-                  onPressed: _pickImage,
-                  icon: Icon(Icons.add_photo_alternate),
-                  label: const Text('Load image'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton.icon(
-                  onPressed: _cropImage,
-                  icon: Icon(Icons.crop),
-                  label: Text('Crop'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton.icon(
-                  onPressed: () => {},
-                  icon: Icon(Icons.rocket),
-                  label: Text('Test'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            ImageViewer(
-              imageBytes: _imageBytes,
-              workingImage: _workingImage,
-              zoneToColor: _selectedColorZone,
-              imageKey: _imageKey,
-              onTap: _handleTouchOnImage,
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Clustering method :',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 20),
-                DropdownButton<SegmentationMethods>(
-                  value: _selectedSegmentationMethod,
-                  onChanged: (SegmentationMethods? newValue) {
-                    setState(() {
-                      _selectedSegmentationMethod = newValue;
-                    });
-                  },
-                  items: [
-                    const DropdownMenuItem<SegmentationMethods>(
-                      value: null,
-                      child: Text(''),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _pickImage,
+                      icon: Icon(Icons.add_photo_alternate),
+                      label: const Text('Load image'),
                     ),
-                    ...SegmentationMethods.values.map((
-                      SegmentationMethods method,
-                    ) {
-                      return DropdownMenuItem<SegmentationMethods>(
-                        value: method,
-                        child: Text(method.label),
-                      );
-                    }).toList(),
+                    const SizedBox(width: 10),
+                    ElevatedButton.icon(
+                      onPressed: _cropImage,
+                      icon: Icon(Icons.crop),
+                      label: Text('Crop'),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton.icon(
+                      onPressed: () => {},
+                      icon: Icon(Icons.rocket),
+                      label: Text('Test'),
+                    ),
                   ],
                 ),
+                const SizedBox(height: 10),
+                ImageViewer(
+                  imageBytes: _imageBytes,
+                  workingImage: _workingImage,
+                  zoneToColor: _selectedColorZone,
+                  imageKey: _imageKey,
+                  onTap: _handleTouchOnImage,
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Clustering method :',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    DropdownButton<SegmentationMethods>(
+                      value: _selectedSegmentationMethod,
+                      onChanged: (SegmentationMethods? newValue) {
+                        setState(() {
+                          _selectedSegmentationMethod = newValue;
+                        });
+                      },
+                      items: [
+                        const DropdownMenuItem<SegmentationMethods>(
+                          value: null,
+                          child: Text(''),
+                        ),
+                        ...SegmentationMethods.values.map((
+                          SegmentationMethods method,
+                        ) {
+                          return DropdownMenuItem<SegmentationMethods>(
+                            value: method,
+                            child: Text(method.label),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: _go,
+                  icon: Icon(Icons.play_arrow),
+                  label: const Text('GO'),
+                ),
+                const SizedBox(height: 20),
+                ColorTable(zones: _colorZones),
               ],
             ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: _go,
-              icon: Icon(Icons.play_arrow),
-              label: const Text('GO'),
-            ),
-            const SizedBox(height: 20),
-            ColorTable(zones: _colorZones),
-          ],
+          ),
         ),
       ),
     );
