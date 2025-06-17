@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:yarn_calculator/core/constants/app_radius.dart';
 import 'package:yarn_calculator/core/constants/colors.dart';
 
 ThemeData buildBauhausTheme() {
@@ -37,19 +38,25 @@ ThemeData buildBauhausTheme() {
         backgroundColor: BauhausColors.yellow,
         foregroundColor: Colors.white,
         textStyle: const TextStyle(letterSpacing: 1.2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.heavy),
+        ),
       ),
     ),
 
     cardTheme: CardTheme(
       color: BauhausColors.surface,
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.strong),
+      ),
     ),
 
     listTileTheme: ListTileThemeData(
       tileColor: BauhausColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.strong),
+      ),
     ),
   );
 }

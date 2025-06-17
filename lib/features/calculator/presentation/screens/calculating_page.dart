@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:yarn_calculator/core/widgets/my_app_scaffold.dart';
+import 'package:yarn_calculator/core/constants/app_spacing.dart';
+import 'package:yarn_calculator/core/widgets/app_scaffold.dart';
+import 'package:yarn_calculator/core/widgets/separated_column.dart';
 import 'package:yarn_calculator/features/calculator/data/models/color_zone.dart';
 import 'package:yarn_calculator/features/calculator/presentation/widgets/color_table.dart';
 import 'package:yarn_calculator/features/crop/presentation/screens/cropping_page.dart';
@@ -166,94 +168,78 @@ class _CalculatingPageState extends State<CalculatingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MyAppScaffold.MyAppScaffold(
+    return AppScaffold.MyAppScaffold(
       title: 'Yarn Calculator',
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: AppSpacing.l),
+        child: SeparatedColumn(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: _pickImage,
-                      icon: Icon(Icons.add_photo_alternate),
-                      label: const Text('Load image'),
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton.icon(
-                      onPressed: _cropImage,
-                      icon: Icon(Icons.crop),
-                      label: Text('Crop'),
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton.icon(
-                      onPressed: () => {},
-                      icon: Icon(Icons.rocket),
-                      label: Text('Test'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                ImageViewer(
-                  imageBytes: _imageBytes,
-                  workingImage: _workingImage,
-                  zoneToColor: _selectedColorZone,
-                  imageKey: _imageKey,
-                  onTap: _handleTouchOnImage,
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Clustering method :',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    DropdownButton<SegmentationMethods>(
-                      value: _selectedSegmentationMethod,
-                      onChanged: (SegmentationMethods? newValue) {
-                        setState(() {
-                          _selectedSegmentationMethod = newValue;
-                        });
-                      },
-                      items: [
-                        const DropdownMenuItem<SegmentationMethods>(
-                          value: null,
-                          child: Text(''),
-                        ),
-                        ...SegmentationMethods.values.map((
-                          SegmentationMethods method,
-                        ) {
-                          return DropdownMenuItem<SegmentationMethods>(
-                            value: method,
-                            child: Text(method.label),
-                          );
-                        }).toList(),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
                 ElevatedButton.icon(
-                  onPressed: _go,
-                  icon: Icon(Icons.play_arrow),
-                  label: const Text('GO'),
+                  onPressed: _pickImage,
+                  icon: Icon(Icons.add_photo_alternate),
+                  label: const Text('Load image'),
                 ),
-                const SizedBox(height: 20),
-                ColorTable(zones: _colorZones),
+                ElevatedButton.icon(
+                  onPressed: _cropImage,
+                  icon: Icon(Icons.crop),
+                  label: Text('Crop'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => {},
+                  icon: Icon(Icons.rocket),
+                  label: Text('Test'),
+                ),
               ],
             ),
-          ),
+            ImageViewer(
+              imageBytes: _imageBytes,
+              workingImage: _workingImage,
+              zoneToColor: _selectedColorZone,
+              imageKey: _imageKey,
+              onTap: _handleTouchOnImage,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Clustering method :',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: AppSpacing.l),
+                DropdownButton<SegmentationMethods>(
+                  value: _selectedSegmentationMethod,
+                  onChanged: (SegmentationMethods? newValue) {
+                    setState(() {
+                      _selectedSegmentationMethod = newValue;
+                    });
+                  },
+                  items: [
+                    const DropdownMenuItem<SegmentationMethods>(
+                      value: null,
+                      child: Text(''),
+                    ),
+                    ...SegmentationMethods.values.map((
+                      SegmentationMethods method,
+                    ) {
+                      return DropdownMenuItem<SegmentationMethods>(
+                        value: method,
+                        child: Text(method.label),
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ],
+            ),
+            ElevatedButton.icon(
+              onPressed: _go,
+              icon: Icon(Icons.play_arrow),
+              label: const Text('GO'),
+            ),
+            ColorTable(zones: _colorZones),
+          ],
         ),
       ),
     );

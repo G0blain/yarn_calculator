@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:yarn_calculator/core/constants/app_spacing.dart';
 
-class MyAppScaffold extends StatelessWidget {
+class AppScaffold extends StatelessWidget {
   final Widget child;
   final String title;
 
-  const MyAppScaffold.MyAppScaffold({
+  const AppScaffold.MyAppScaffold({
     super.key,
     required this.child,
     required this.title,
@@ -23,12 +24,17 @@ class MyAppScaffold extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 900),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.m,
+                    ),
                     child: child,
                   ),
                 ),
               )
-              : Padding(padding: const EdgeInsets.all(16), child: child),
+              : Padding(
+                padding: const EdgeInsets.all(AppSpacing.m),
+                child: child,
+              ),
     );
   }
 }

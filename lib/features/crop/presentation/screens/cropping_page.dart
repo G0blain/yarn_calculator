@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 import 'dart:typed_data';
 
+import 'package:yarn_calculator/core/constants/app_spacing.dart';
+
 class CroppingPage extends StatefulWidget {
   final Uint8List _imageBytes;
   CroppingPage({required Uint8List imageBytes}) : _imageBytes = imageBytes;
@@ -58,7 +60,7 @@ class _CroppingPageState extends State<CroppingPage> {
                 withCircleUi: _isCircleUI,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.l),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -78,7 +80,7 @@ class _CroppingPageState extends State<CroppingPage> {
                   icon: const Icon(Icons.circle_outlined),
                   label: const Text('CIRCLE'),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: AppSpacing.s),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
@@ -97,7 +99,7 @@ class _CroppingPageState extends State<CroppingPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.l),
             ElevatedButton(
               onPressed: () {
                 _isCircleUI
@@ -106,7 +108,7 @@ class _CroppingPageState extends State<CroppingPage> {
               },
               child: Text('Validate'),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.l),
           ],
         ),
       ),
